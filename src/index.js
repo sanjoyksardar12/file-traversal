@@ -7,9 +7,6 @@ const map = [];
 let ID = 0;
 
 function fetchFileContentAndItsDependencies(filename) {
-
-  // console.log(filename);
-
   let { content, actualFilename } = getConntentAndFilename(filename);
   if (map.includes(actualFilename)) {
     return null;
@@ -96,28 +93,28 @@ function fileTraversal(entry, options, callback) {
     })
   }
 }
-function getIcons(line) {
-  return line.match(/ic(\-[a-zA-Z]+)+/ig);
+function getIcons(line, filename) {
+  const lineIcons = line.match(/ic(\-[a-zA-Z]+)+/ig);
+  return lineIcons;
 }
 
-const entryPoint = "ABSOLUTE PATH";
+const entryPoint = "ABSOLUTE_PATH";
 
 const allIcons = [];
 
 function matchedLine(line, filename) {
-  const icons = getIcons(line.trim());
-  allIcons.push(...icons);
-  console.log(ID++, filename.split("src")[1], "=====>", line.trim(), icons);
+  const icons = getIcons(line.trim(), filename);
+  if (icons && icons.length) {
+    allIcons.push(...icons);
+  } else {
+    console.log("Not able to parse icon for filename===>", filename, line);
+  }
 }
 
 fileTraversal(entryPoint, {
   lineSearch: true,
   matchRegex: /ic-/
 }, matchedLine);
-
-
-// const filteredIcons = [...allIcons].filter((icon, index) => allIcons.indexOf(icon) !== index);
-const filteredIcons = [ ...new Set(allIcons)];
-console.log("filteredIcons====>");
+const filteredIcons = [...new Set(allIcons)];
 console.log(filteredIcons.length, filteredIcons.sort());
 
