@@ -19,10 +19,8 @@ function fetchFileContentAndItsDependencies(filename) {
       "@babel/react"
     ],
     plugins: [
-      //  "@babel/plugin-proposal-class-properties"
       "classProperties",
       "jsx",
-      // "dynamicImport"
     ]
   });
   // console.log(JSON.stringify(ast, null, 2));
@@ -70,7 +68,6 @@ function checkMatchOption(asset, options, callback) {
     const lines = asset.content.split("\n");
     lines.forEach(eachLine => {
       if (options.matchRegex.test(eachLine)) {
-        // console.log(eachLine);
         callback(eachLine, asset.filename);
       }
     });
@@ -84,7 +81,6 @@ function fileTraversal(entry, options, callback) {
     checkMatchOption(asset, options, callback);
     const dirname = path.dirname(asset.filename);
     asset.dependencies.forEach(relativePath => {
-      // console.log("\n\n\n fertching for asset.filename", asset.filename, "\n\n\n");
       let absolutePath = path.join(dirname, relativePath);
       const child = fetchFileContentAndItsDependencies(absolutePath);
       if (child) {
