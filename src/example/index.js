@@ -9,6 +9,7 @@ function getIcons(line, filename) {
 }
 
 function matchedLine(line, filename) {
+  console.log(line.trim());
   const icons = getIcons(line.trim(), filename);
   if (icons && icons.length) {
     allIcons.push(...icons);
@@ -16,7 +17,7 @@ function matchedLine(line, filename) {
     console.log("Not able to parse icon for filename===>", filename, line);
   }
 }
-const entryPoint = "ABSOLUTE_PATH";
+const entryPoint = "ABSOLUTE_URL";
 fileTraversal(entryPoint, {
   lineSearch: true,
   matchRegex: /ic-/
