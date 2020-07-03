@@ -1,10 +1,31 @@
+"use strict";
+
 const fs = require("fs");
 const parser = require("@babel/parser");
 const traverse = require("@babel/traverse").default;
 const path = require("path");
+exports.__esModule = true;
 
 const map = [];
-let ID = 0;
+
+
+function getConntentAndFilename(filename) {
+  let content;
+  let actualFilename;
+  try {
+    if (!filename.endsWith(".js")) {
+      content = fs.readFileSync(filename + ".js", "utf-8");
+      actualFilename = filename + ".js";
+    } else {
+      content = fs.readFileSync(filename, "utf-8");
+      actualFilename = filename;
+    }
+  } catch (err) {
+    content = fs.readFileSync(filename + "/index.js", "utf-8");
+    actualFilename = filename + "/index.js";
+  };
+  return { content, actualFilename };
+}
 
 function fetchFileContentAndItsDependencies(filename) {
   let { content, actualFilename } = getConntentAndFilename(filename);
@@ -23,7 +44,7 @@ function fetchFileContentAndItsDependencies(filename) {
       "jsx",
     ]
   });
-  // console.log(JSON.stringify(ast, null, 2));
+
   const dependencies = [];
   traverse(ast, {
     ImportDeclaration: function ({ node }) {
@@ -45,24 +66,6 @@ function fetchFileContentAndItsDependencies(filename) {
   }
 }
 
-function getConntentAndFilename(filename) {
-  let content;
-  let actualFilename;
-  try {
-    if (!filename.endsWith(".js")) {
-      content = fs.readFileSync(filename + ".js", "utf-8");
-      actualFilename = filename + ".js";
-    } else {
-      content = fs.readFileSync(filename, "utf-8");
-      actualFilename = filename;
-    }
-  } catch (err) {
-    content = fs.readFileSync(filename + "/index.js", "utf-8");
-    actualFilename = filename + "/index.js";
-  };
-  return { content, actualFilename };
-}
-
 function checkMatchOption(asset, options, callback) {
   if (options.lineSearch === true) {
     const lines = asset.content.split("\n");
@@ -74,7 +77,7 @@ function checkMatchOption(asset, options, callback) {
   }
 }
 
-function fileTraversal(entry, options, callback) {
+exports.fileTraversal = function (entry, options, callback) {
   const entryAssets = fetchFileContentAndItsDependencies(entry);
   const queue = [entryAssets];
   for (const asset of queue) {
@@ -89,28 +92,4 @@ function fileTraversal(entry, options, callback) {
     })
   }
 }
-function getIcons(line, filename) {
-  const lineIcons = line.match(/ic(\-[a-zA-Z]+)+/ig);
-  return lineIcons;
-}
-
-const entryPoint = "ABSOLUTE_PATH";
-
-const allIcons = [];
-
-function matchedLine(line, filename) {
-  const icons = getIcons(line.trim(), filename);
-  if (icons && icons.length) {
-    allIcons.push(...icons);
-  } else {
-    console.log("Not able to parse icon for filename===>", filename, line);
-  }
-}
-
-fileTraversal(entryPoint, {
-  lineSearch: true,
-  matchRegex: /ic-/
-}, matchedLine);
-const filteredIcons = [...new Set(allIcons)];
-console.log(filteredIcons.length, filteredIcons.sort());
 
