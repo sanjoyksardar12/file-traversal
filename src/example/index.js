@@ -1,5 +1,5 @@
 const { fileTraversal } = require("../index.js");
-console.log(fileTraversal);
+const path = require("path");
 
 const allIcons = [];
 
@@ -17,7 +17,8 @@ function matchedLine(line, filename) {
     console.log("Not able to parse icon for filename===>", filename, line);
   }
 }
-const entryPoint = "ABSOLUTE_URL";
+const entryPoint = path.resolve(__dirname, "entry.js");
+
 fileTraversal(entryPoint, {
   lineSearch: true,
   matchRegex: /ic-/
